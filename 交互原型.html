@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容创作能力提升系统 - 交互原型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* 内容类型选择器 */
+        .content-types {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .content-type {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 3px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .content-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .content-type.active {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .content-type-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .content-type-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+
+        .content-type-desc {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 4px;
+        }
+
+        /* 循环进度 */
+        .progress-ring {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .progress-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-item:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bdc3c7;
+            font-size: 20px;
+        }
+
+        .progress-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .progress-circle.active {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .progress-circle.completed {
+            background: #27ae60;
+            color: white;
+        }
+
+        .progress-circle:not(.active):not(.completed) {
+            background: #ecf0f1;
+            color: #95a5a6;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        /* 主内容区 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .content-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title .icon {
+            font-size: 20px;
+        }
+
+        .panel-title .type-badge {
+            margin-left: auto;
+            font-size: 12px;
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* 步骤1：看 */
+        .step-view textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .step-view textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff5252;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* 分析结果 */
+        .analysis-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .analysis-result.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .analysis-section {
+            margin-bottom: 12px;
+        }
+
+        .analysis-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .analysis-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .analysis-content {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 公式分类选择 */
+        .formula-categories {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .formula-category {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 2px solid #e0e0e0;
+            background: white;
+            transition: all 0.2s;
+        }
+
+        .formula-category.selected {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            color: #ff6b6b;
+        }
+
+        /* 步骤2：写 */
+        .write-form {
+            display: none;
+        }
+
+        .write-form.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        /* 生成结果 */
+        .generated-versions {
+            margin-top: 16px;
+        }
+
+        .version-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .version-card:hover {
+            border-color: #ff6b6b;
+        }
+
+        .version-card.selected {
+            border-color: #27ae60;
+            background: #e8f5e9;
+        }
+
+        .version-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .version-content {
+            color: #7f8c8d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 步骤3：反思 */
+        .reflect-form {
+            display: none;
+        }
+
+        .reflect-form.show {
+            display: block;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item label {
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 右侧记录本 */
+        .notebooks {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .notebook {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .notebook:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .notebook-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .notebook-icon {
+            font-size: 20px;
+        }
+
+        .notebook-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .notebook-count {
+            margin-left: auto;
+            background: #ecf0f1;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .notebook-preview {
+            font-size: 13px;
+            color: #95a5a6;
+            line-height: 1.4;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #95a5a6;
+        }
+
+        .modal-close:hover {
+            color: #2c3e50;
+        }
+
+        /* 公式库分类标签 */
+        .formula-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 12px;
+        }
+
+        .formula-tab {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            background: #f8f9fa;
+            transition: all 0.2s;
+        }
+
+        .formula-tab.active {
+            border-color: #ff6b6b;
+            background: #fff5f5;
+            color: #ff6b6b;
+        }
+
+        /* 记录本内容 */
+        .notebook-content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .notebook-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            border-left: 3px solid #ff6b6b;
+        }
+
+        .notebook-item-date {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-bottom: 4px;
+        }
+
+        .notebook-item-content {
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+
+        .notebook-item-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #856404;
+            margin-left: 8px;
+        }
+
+        /* 成功提示 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* 时间范围选择 */
+        .time-range {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .time-range-item {
+            flex: 1;
+        }
+
+        .time-range-item label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .time-range-item input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .content-types {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-item:not(:last-child)::after {
+                display: none;
+            }
+
+            .progress-ring {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部 -->
+        <div class="header">
+            <h1>📝 大众点评内容创作能力提升系统</h1>
+            <p>通过「看→写→反思」的循环，不断提升你的内容创作能力</p>
+        </div>
+
+        <!-- 内容类型选择器 -->
+        <div class="content-types">
+            <div class="content-type active" data-type="checkin" onclick="switchType('checkin')">
+                <div class="content-type-icon">📍</div>
+                <div class="content-type-name">打卡</div>
+                <div class="content-type-desc">记录到访，简单快捷</div>
+            </div>
+            <div class="content-type" data-type="review" onclick="switchType('review')">
+                <div class="content-type-icon">⭐</div>
+                <div class="content-type-name">写评价</div>
+                <div class="content-type-desc">详细点评，分享体验</div>
+            </div>
+            <div class="content-type" data-type="note" onclick="switchType('note')">
+                <div class="content-type-icon">📔</div>
+                <div class="content-type-name">发笔记</div>
+                <div class="content-type-desc">图文内容，种草分享</div>
+            </div>
+            <div class="content-type" data-type="favorite" onclick="switchType('favorite')">
+                <div class="content-type-icon">❤️</div>
+                <div class="content-type-name">标记好去处</div>
+                <div class="content-type-desc">收藏整理，推荐给他人</div>
+            </div>
+        </div>
+
+        <!-- 循环进度 -->
+        <div class="progress-ring">
+            <div class="progress-item">
+                <div class="progress-circle active" data-step="1" onclick="switchStep(1)">👀</div>
+                <div class="progress-label">看（学习）</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-circle" data-step="2" onclick="switchStep(2)">✍️</div>
+                <div class="progress-label">写（实战）</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-circle" data-step="3" onclick="switchStep(3)">🤔</div>
+                <div class="progress-label">反思（沉淀）</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-circle" data-step="4" onclick="switchStep(4)">🎨</div>
+                <div class="progress-label">风格总结</div>
+            </div>
+        </div>
+
+        <!-- 主内容 -->
+        <div class="main-content">
+            <!-- 左侧：操作区 -->
+            <div class="content-panel">
+                <!-- 步骤1：看 -->
+                <div id="step1" class="step-view">
+                    <div class="panel-title">
+                        <span class="icon">👀</span>
+                        看一篇<span id="currentTypeName1">打卡</span>爆款，提取公式
+                        <span class="type-badge" id="currentTypeBadge">打卡</span>
+                    </div>
+                    <p style="color: #7f8c8d; margin-bottom: 16px; font-size: 14px;">
+                        找一篇你觉得好的<span id="currentTypeName2">打卡</span>内容，粘贴到下方，AI会帮你分析结构并提取可复用的公式。
+                    </p>
+                    <textarea id="analyzeInput" placeholder="粘贴一篇你觉得好的内容到这里..."></textarea>
+
+                    <!-- 选择公式类别 -->
+                    <div class="formula-categories">
+                        <div class="formula-category selected" data-category="title" onclick="selectCategory(this)">标题公式</div>
+                        <div class="formula-category" data-category="opening" onclick="selectCategory(this)">开头套路</div>
+                        <div class="formula-category" data-category="structure" onclick="selectCategory(this)">结构框架</div>
+                        <div class="formula-category" data-category="highlight" onclick="selectCategory(this)">亮点技巧</div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="analyzeContent()">🔍 分析内容</button>
+
+                    <div id="analysisResult" class="analysis-result">
+                        <div class="analysis-section">
+                            <div class="analysis-label">📌 标题公式</div>
+                            <div class="analysis-content">数字 + 疑问 + 结论<br>「排队2小时」→ 数字制造冲突<br>「到底值不值」→ 疑问引发好奇</div>
+                        </div>
+                        <div class="analysis-section">
+                            <div class="analysis-label">📖 开头套路</div>
+                            <div class="analysis-content">推荐来源 + 终于行动 + 场景描述</div>
+                        </div>
+                        <div class="analysis-section">
+                            <div class="analysis-label">📐 结构框架</div>
+                            <div class="analysis-content">来源 → 味道 → 环境 → 人均 → 结论</div>
+                        </div>
+                        <div class="analysis-section">
+                            <div class="analysis-label">✨ 亮点技巧</div>
+                            <div class="analysis-content">「回香」「涮10秒」→ 用具体描述代替空泛评价</div>
+                        </div>
+                        <button class="btn btn-success" style="margin-top: 12px;" onclick="saveToFormula()">💾 保存到公式库</button>
+                    </div>
+                </div>
+
+                <!-- 步骤2：写 -->
+                <div id="step2" class="write-form">
+                    <div class="panel-title">
+                        <span class="icon">✍️</span>
+                        写一篇<span id="currentTypeName3">打卡</span>
+                        <span class="type-badge" id="currentTypeBadge2">打卡</span>
+                    </div>
+                    <p style="color: #7f8c8d; margin-bottom: 16px; font-size: 14px;">
+                        告诉AI你的探店体验，AI会根据公式库生成多个版本让你选择。
+                    </p>
+                    <div class="form-group">
+                        <label>店铺/地点名称</label>
+                        <input type="text" id="venueName" placeholder="例如：巷子里的小火锅">
+                    </div>
+                    <div class="form-group">
+                        <label>位置</label>
+                        <input type="text" id="venueLocation" placeholder="例如：老城区建设路">
+                    </div>
+                    <div class="form-group">
+                        <label>体验关键词（用逗号分隔）</label>
+                        <textarea id="experienceKeywords" placeholder="例如：味道不错,锅底很香,牛肉新鲜,环境有烟火气,人均85,排队久"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>使用的公式类型</label>
+                        <select id="formulaSelect">
+                            <option value="1">数字+疑问+结论（标题）</option>
+                            <option value="2">推荐来源+场景描述（开头）</option>
+                            <option value="3">体验→亮点→不足→推荐（结构）</option>
+                            <option value="4">AI推荐最适合的公式</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateContent()">🤖 生成内容</button>
+
+                    <div id="generatedVersions" class="generated-versions" style="display: none;">
+                        <p style="font-size: 14px; color: #7f8c8d; margin-bottom: 12px;">选择一个版本，或继续优化：</p>
+                        <div class="version-card" onclick="selectVersion(this, 1)">
+                            <div class="version-title">版本1：按公式生成</div>
+                            <div class="version-content">
+                                📍 打卡：巷子里的小火锅<br><br>
+                                今天终于来拔草了！朋友推荐了好几次的这家藏在老城区的小火锅。<br><br>
+                                锅底很香，牛肉新鲜，人均85元，值得来~
+                            </div>
+                        </div>
+                        <div class="version-card" onclick="selectVersion(this, 2)">
+                            <div class="version-title">版本2：更简洁</div>
+                            <div class="version-content">
+                                📍 已打卡：巷子里的小火锅<br><br>
+                                排队2小时终于吃上了！味道对得起排队，锅底回香，牛肉涮10秒刚好。<br>
+                                人均85，环境有烟火气，推荐错峰来~
+                            </div>
+                        </div>
+                        <div class="version-card" onclick="selectVersion(this, 3)">
+                            <div class="version-title">版本3：更活泼</div>
+                            <div class="version-content">
+                                📍 打卡成功！这家小火锅我愿意再来<br><br>
+                                本来以为排队是噱头，吃完发现真香！<br>
+                                锅底、牛肉都不踩雷，性价比OK，建议大家早点来避排队~
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 12px;">
+                            <button class="btn btn-secondary" onclick="regenerateTitle()">🔄 换个标题</button>
+                            <button class="btn btn-success" onclick="saveWork()">💾 保存作品</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3：反思 -->
+                <div id="step3" class="reflect-form">
+                    <div class="panel-title">
+                        <span class="icon">🤔</span>
+                        写完了，简单反思一下
+                        <span class="type-badge" id="currentTypeBadge3">打卡</span>
+                    </div>
+                    <p style="color: #7f8c8d; margin-bottom: 16px; font-size: 14px;">
+                        写完后的反思能让你更了解自己的写作风格，每次反思都是进步。
+                    </p>
+
+                    <!-- 反思文章来源 -->
+                    <div class="form-group">
+                        <label>反思的文章来源</label>
+                        <select id="reflectionSource">
+                            <option value="self">自己写的作品</option>
+                            <option value="template">套用公式生成的</option>
+                            <option value="ai">AI辅助完成的</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+
+                    <!-- 时间范围 -->
+                    <div class="time-range">
+                        <div class="time-range-item">
+                            <label>反思开始时间</label>
+                            <input type="date" id="reflectionStartDate">
+                        </div>
+                        <div class="time-range-item">
+                            <label>反思结束时间</label>
+                            <input type="date" id="reflectionEndDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>1. 这篇你最满意哪个部分？</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="satisfy1" value="title">
+                                <label for="satisfy1">标题</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="satisfy2" value="opening">
+                                <label for="satisfy2">开头</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="satisfy3" value="middle">
+                                <label for="satisfy3">中间描述</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="satisfy4" value="ending">
+                                <label for="satisfy4">结尾</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>2. 写起来哪个部分最顺手？</label>
+                        <input type="text" id="smoothPart" placeholder="例如：结尾写得比较快">
+                    </div>
+                    <div class="form-group">
+                        <label>3. 有没有觉得哪里还不够好？下次想尝试什么？</label>
+                        <textarea id="improveIdea" placeholder="例如：中间描述感觉有点干，下次想加些具体的细节"></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="saveReflection()">💾 保存反思</button>
+                </div>
+
+                <!-- 步骤4：风格总结 -->
+                <div id="step4" class="style-profile" style="display: none;">
+                    <div class="panel-title">
+                        <span class="icon">🎨</span>
+                        <span id="currentTypeName4">打卡</span>的写作风格画像
+                        <span class="type-badge" id="currentTypeBadge4">打卡</span>
+                    </div>
+                    <p style="color: #7f8c8d; margin-bottom: 16px; font-size: 14px;">
+                        根据你的<span id="currentTypeName5">打卡</span>作品和反思，AI为你总结的写作风格。
+                    </p>
+                    <div class="style-section">
+                        <div class="style-section-title">📌 标题偏好</div>
+                        <div class="style-tags">
+                            <span class="style-tag">数字式</span>
+                            <span class="style-tag">疑问式</span>
+                        </div>
+                    </div>
+                    <div class="style-section">
+                        <div class="style-section-title">📖 开头偏好</div>
+                        <div class="style-tags">
+                            <span class="style-tag">简洁切入</span>
+                            <span class="style-tag">场景描述</span>
+                        </div>
+                    </div>
+                    <div class="style-section">
+                        <div class="style-section-title">📐 内容特点</div>
+                        <div style="color: #7f8c8d; font-size: 14px; margin-top: 8px;">
+                            简洁、有信息点、带位置标记
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：记录本 -->
+            <div class="notebooks">
+                <div class="notebook" onclick="openNotebook('formula')">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">📚</span>
+                        <span class="notebook-name">公式库</span>
+                        <span class="notebook-count" id="formulaCount">0 条</span>
+                    </div>
+                    <div class="notebook-preview">标题公式、开头套路、结构框架、亮点技巧...</div>
+                </div>
+                <div class="notebook" onclick="openNotebook('works')">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">📝</span>
+                        <span class="notebook-name">作品记录</span>
+                        <span class="notebook-count" id="worksCount">0 篇</span>
+                    </div>
+                    <div class="notebook-preview">每篇作品的发布时间、数据、你的评分...</div>
+                </div>
+                <div class="notebook" onclick="openNotebook('growth')">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">🌱</span>
+                        <span class="notebook-name">成长日记</span>
+                        <span class="notebook-count" id="growthCount">0 条</span>
+                    </div>
+                    <div class="notebook-preview">每次反思的记录，文章来源、时间范围...</div>
+                </div>
+                <div class="notebook" onclick="openNotebook('style')">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">🎨</span>
+                        <span class="notebook-name">风格总结</span>
+                        <span class="notebook-count" id="styleCount">4 个维度</span>
+                    </div>
+                    <div class="notebook-preview">打卡、评价、笔记、好去处各自的风格画像</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框：查看记录本 -->
+    <div id="notebookModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">记录本</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <!-- 公式库：显示分类标签 -->
+            <div id="formulaTabs" class="formula-tabs" style="display: none;">
+                <div class="formula-tab active" data-tab="all" onclick="switchFormulaTab('all')">全部</div>
+                <div class="formula-tab" data-tab="title" onclick="switchFormulaTab('title')">标题公式</div>
+                <div class="formula-tab" data-tab="opening" onclick="switchFormulaTab('opening')">开头套路</div>
+                <div class="formula-tab" data-tab="structure" onclick="switchFormulaTab('structure')">结构框架</div>
+                <div class="formula-tab" data-tab="highlight" onclick="switchFormulaTab('highlight')">亮点技巧</div>
+            </div>
+
+            <div id="modalBody" class="notebook-content-list">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div id="toast" class="toast">✓ 已保存</div>
+
+    <script>
+        // 当前选中的内容类型
+        let currentType = 'checkin';
+        let currentFormulaCategory = 'title';
+
+        // 数据存储（模拟）
+        let formulaCount = { title: 0, opening: 0, structure: 0, highlight: 0 };
+        let worksCount = { checkin: 0, review: 0, note: 0, favorite: 0 };
+        let growthCount = { checkin: 0, review: 0, note: 0, favorite: 0 };
+
+        // 内容类型名称
+        const typeNames = {
+            checkin: '打卡',
+            review: '评价',
+            note: '笔记',
+            favorite: '好去处'
+        };
+
+        // 切换内容类型
+        function switchType(type) {
+            currentType = type;
+
+            // 更新类型选择器样式
+            document.querySelectorAll('.content-type').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+
+            // 更新所有显示类型名称的地方
+            document.querySelectorAll('[id^="currentTypeName"]').forEach(el => {
+                el.textContent = typeNames[type];
+            });
+            document.querySelectorAll('[id^="currentTypeBadge"]').forEach(el => {
+                el.textContent = typeNames[type];
+            });
+
+            // 重置到第一步
+            switchStep(1);
+
+            // 更新生成内容的示例
+            updateGeneratedExamples();
+        }
+
+        // 更新生成内容示例
+        function updateGeneratedExamples() {
+            const examples = {
+                checkin: {
+                    v1: '📍 打卡：巷子里的小火锅<br><br>今天终于来拔草了！朋友推荐了好几次的这家藏在老城区的小火锅。<br><br>锅底很香，牛肉新鲜，人均85元，值得来~',
+                    v2: '📍 已打卡：巷子里的小火锅<br><br>排队2小时终于吃上了！味道对得起排队，锅底回香，牛肉涮10秒刚好。<br>人均85，环境有烟火气，推荐错峰来~',
+                    v3: '📍 打卡成功！这家小火锅我愿意再来<br><br>本来以为排队是噱头，吃完发现真香！<br>锅底、牛肉都不踩雷，性价比OK，建议大家早点来避排队~'
+                },
+                review: {
+                    v1: '⭐⭐⭐⭐⭐ 五星推荐！排队2小时也值得<br><br>【口味】锅底很香，是那种回香不是满嘴花椒。牛肉新鲜，涮10秒刚好。<br>【环境】小店8张桌，有点挤但有烟火气。<br>【性价比】人均85，在这个位置算良心。<br><br>结论：值得来，建议错峰避排队。',
+                    v2: '为了这口牛肉，我愿意再排2小时<br><br>朋友推荐了好几次，今天终于来拔草。<br><br>👉 味道：对得起排队，锅底回香，牛肉新鲜<br>👉 环境：老店有烟火气，就是有点挤<br>👉 人均：85元，性价比OK<br><br>错峰来，值得一试！',
+                    v3: '巷子里的小火锅：味道对得起排队<br><br>这家店在老城区一条小巷子里，门口排长队就是它了。<br><br>✅ 推荐理由：<br>1. 锅底回香，不是那种满嘴花椒的麻<br>2. 牛肉新鲜，涮10秒刚好<br>3. 人均85，价格良心<br><br>❌ 排队久，建议早点到或错峰。'
+                },
+                note: {
+                    v1: '🔥 终于来拔草了！这家藏在巷子里的小火锅<br><br>朋友推荐了好几次，今天终于来了！<br><br>📍 老城区建设路小巷子里<br><br>真的对得起排队！<br>✅ 锅底很香，回香不是满嘴花椒<br>✅ 牛肉新鲜，涮10秒刚好<br>✅ 人均85，性价比OK<br><br>环境有点挤，但有烟火气~<br><br>#火锅店 #探店 #美食推荐',
+                    v2: '排队2小时，这家小火锅到底值不值？🍲<br><br>答案：值！<br><br>今天来拔草朋友推荐的小火锅：<br><br>🔸 锅底：回香型，不麻嘴<br>🔸 牛肉：新鲜，涮10秒<br>🔸 环境：老店8张桌，有烟火气<br>🔸 价格：人均85<br><br>建议错峰来，不然要排队！<br><br>#宝藏小店 #火锅 #周末吃什么',
+                    v3: '发现一家值得N刷的小火锅！❤️<br><br>在老城区瞎逛，看到排队就跟着排了。<br><br>没想到真的好吃！<br><br>🍲 锅底很香，不是那种满嘴花椒<br>🥩 牛肉新鲜，涮10秒口感刚好<br>💰 人均85，吃得饱<br><br>环境有点挤，但这种老店就是这样嘛~<br><br>推荐！<br>#美食 #火锅 #探店'
+                },
+                favorite: {
+                    v1: '❤️ 已收藏：巷子里的小火锅<br><br>值得N刷的小店！<br><br>📍 老城区建设路<br>💰 人均85<br>⭐ 推荐错峰来<br><br>锅底回香，牛肉新鲜，环境有烟火气。<br>排队久但值得！',
+                    v2: '我的私藏火锅店清单·第1家<br><br>🏠 巷子里的小火锅<br>📍 老城区建设路<br>💰 人均85<br><br>✨ 推荐理由：<br>• 锅底回香型<br>• 牛肉新鲜<br>• 有烟火气<br><br>⚠️ 排队久，建议错峰',
+                    v3: '📍 好去处推荐：适合朋友聚会的小火锅<br><br>这家藏在巷子里的小火锅，我愿意推荐给朋友：<br><br>✅ 味道对得起排队<br>✅ 环境有烟火气，适合聊天<br>✅ 人均85，价格不贵<br><br>地址：老城区建设路<br>建议：错峰或早点到'
+                }
+            };
+
+            const current = examples[currentType];
+            if (current && document.querySelectorAll('.version-content')) {
+                const contents = document.querySelectorAll('.version-content');
+                contents[0].innerHTML = current.v1;
+                contents[1].innerHTML = current.v2;
+                contents[2].innerHTML = current.v3;
+            }
+        }
+
+        // 切换步骤
+        function switchStep(step) {
+            // 隐藏所有步骤
+            document.querySelectorAll('.step-view, .write-form, .reflect-form, .style-profile').forEach(el => {
+                el.classList.remove('show');
+                el.style.display = 'none';
+            });
+
+            // 显示选中步骤
+            const stepElement = document.getElementById('step' + step);
+            if (stepElement) {
+                stepElement.style.display = 'block';
+                setTimeout(() => stepElement.classList.add('show'), 10);
+            }
+
+            // 更新进度圈状态
+            document.querySelectorAll('.progress-circle').forEach(circle => {
+                const stepNum = parseInt(circle.dataset.step);
+                circle.classList.remove('active', 'completed');
+                if (stepNum < step) {
+                    circle.classList.add('completed');
+                } else if (stepNum === step) {
+                    circle.classList.add('active');
+                }
+            });
+        }
+
+        // 选择公式类别
+        function selectCategory(element) {
+            document.querySelectorAll('.formula-category').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            currentFormulaCategory = element.dataset.category;
+        }
+
+        // 分析内容
+        function analyzeContent() {
+            const input = document.getElementById('analyzeInput').value;
+            if (!input.trim()) {
+                alert('请先粘贴内容');
+                return;
+            }
+            document.getElementById('analysisResult').classList.add('show');
+        }
+
+        // 保存到公式库
+        function saveToFormula() {
+            formulaCount[currentFormulaCategory]++;
+            updateFormulaCount();
+            showToast('✓ 已保存到' + getCategoryName(currentFormulaCategory));
+            // 自动跳到下一步
+            setTimeout(() => switchStep(2), 500);
+        }
+
+        // 更新公式计数
+        function updateFormulaCount() {
+            const total = Object.values(formulaCount).reduce((a, b) => a + b, 0);
+            document.getElementById('formulaCount').textContent = total + ' 条';
+        }
+
+        // 获取类别名称
+        function getCategoryName(category) {
+            const names = {
+                title: '标题公式',
+                opening: '开头套路',
+                structure: '结构框架',
+                highlight: '亮点技巧'
+            };
+            return names[category] || category;
+        }
+
+        // 生成内容
+        function generateContent() {
+            const venue = document.getElementById('venueName').value;
+            if (!venue.trim()) {
+                alert('请先填写店铺/地点名称');
+                return;
+            }
+            updateGeneratedExamples();
+            document.getElementById('generatedVersions').style.display = 'block';
+        }
+
+        // 选择版本
+        function selectVersion(element, version) {
+            document.querySelectorAll('.version-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // 重新生成标题
+        function regenerateTitle() {
+            alert('🔄 已生成新的标题选项！');
+        }
+
+        // 保存作品
+        function saveWork() {
+            worksCount[currentType]++;
+            document.getElementById('worksCount').textContent = getTotalWorks() + ' 篇';
+            showToast('✓ 作品已保存');
+            // 自动跳到下一步
+            setTimeout(() => switchStep(3), 500);
+        }
+
+        // 获取作品总数
+        function getTotalWorks() {
+            return Object.values(worksCount).reduce((a, b) => a + b, 0);
+        }
+
+        // 保存反思
+        function saveReflection() {
+            growthCount[currentType]++;
+            document.getElementById('growthCount').textContent = getTotalGrowth() + ' 条';
+            showToast('✓ 反思已保存');
+            // 每5次提醒做风格总结
+            if (growthCount[currentType] % 5 === 0) {
+                setTimeout(() => {
+                    alert('🎉 你已完成 ' + growthCount[currentType] + ' 次' + typeNames[currentType] + '循环！\n\n去看看你的风格总结吧！');
+                    switchStep(4);
+                }, 600);
+            } else {
+                // 回到第一步继续循环
+                setTimeout(() => switchStep(1), 600);
+            }
+        }
+
+        // 获取反思总数
+        function getTotalGrowth() {
+            return Object.values(growthCount).reduce((a, b) => a + b, 0);
+        }
+
+        // 打开记录本
+        function openNotebook(type) {
+            const modal = document.getElementById('notebookModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            const tabs = document.getElementById('formulaTabs');
+
+            let content = '';
+            let titleText = '';
+
+            if (type === 'formula') {
+                titleText = '📚 公式库';
+                tabs.style.display = 'flex';
+                content = getFormulaContent('all');
+            } else if (type === 'works') {
+                titleText = '📝 作品记录';
+                tabs.style.display = 'none';
+                content = getWorksContent();
+            } else if (type === 'growth') {
+                titleText = '🌱 成长日记';
+                tabs.style.display = 'none';
+                content = getGrowthContent();
+            } else if (type === 'style') {
+                titleText = '🎨 风格总结';
+                tabs.style.display = 'none';
+                content = getStyleContent();
+            }
+
+            title.textContent = titleText;
+            body.innerHTML = content || '<p style="color: #95a5a6;">暂无记录</p>';
+            modal.classList.add('show');
+        }
+
+        // 获取公式库内容
+        function getFormulaContent(tab) {
+            const formulas = {
+                title: [
+                    { date: '2024-01-15', content: '<strong>数字+疑问+结论</strong><br>「排队2小时，这家火锅到底值不值？」', count: 3 },
+                    { date: '2024-01-16', content: '<strong>对比式</strong><br>「比XX还好吃，这家宝藏被我发现了」', count: 1 }
+                ],
+                opening: [
+                    { date: '2024-01-15', content: '<strong>推荐来源+场景描述</strong><br>「朋友推荐了好几次，今天终于来拔草了」', count: 2 }
+                ],
+                structure: [
+                    { date: '2024-01-15', content: '<strong>体验→亮点→不足→推荐</strong><br>经典四段式结构', count: 1 }
+                ],
+                highlight: [
+                    { date: '2024-01-15', content: '<strong>具体描述代替空泛评价</strong><br>「回香」「涮10秒」「烟火气」', count: 1 }
+                ]
+            };
+
+            let html = '';
+            const categories = tab === 'all' ? ['title', 'opening', 'structure', 'highlight'] : [tab];
+
+            categories.forEach(cat => {
+                formulas[cat].forEach(item => {
+                    html += `
+                        <div class="notebook-item">
+                            <div class="notebook-item-date">${item.date} · ${getCategoryName(cat)} ${item.count > 1 ? '<span class="notebook-item-count">🔥 ' + item.count + '次</span>' : ''}</div>
+                            <div class="notebook-item-content">${item.content}</div>
+                        </div>
+                    `;
+                });
+            });
+
+            return html || '<p style="color: #95a5a6;">暂无记录</p>';
+        }
+
+        // 获取作品记录内容
+        function getWorksContent() {
+            return `
+                <div class="notebook-item">
+                    <div class="notebook-item-date">2024-01-15 | 打卡 | 浏览238 点赞15 收藏8</div>
+                    <div class="notebook-item-content">
+                        <strong>巷子里的小火锅</strong> - 人均60元，这家老王烧烤值不值得等？<br>
+                        <span style="color: #27ae60;">⭐⭐⭐⭐ 很满意</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 获取成长日记内容
+        function getGrowthContent() {
+            return `
+                <div class="notebook-item">
+                    <div class="notebook-item-date">打卡 · 2024-01-10 至 2024-01-15 | 来源：自己写的作品</div>
+                    <div class="notebook-item-content">
+                        <strong>循环 #1</strong><br>
+                        满意：标题和开头<br>
+                        需改进：中间描述太干<br>
+                        下次尝试：加具体细节
+                    </div>
+                </div>
+            `;
+        }
+
+        // 获取风格总结内容
+        function getStyleContent() {
+            return `
+                <div class="notebook-item">
+                    <div class="notebook-item-date">📍 打卡</div>
+                    <div class="notebook-item-content">
+                        <strong>标题偏好：</strong>数字式、简洁<br>
+                        <strong>内容特点：</strong>简短、带位置、有信息点
+                    </div>
+                </div>
+                <div class="notebook-item">
+                    <div class="notebook-item-date">⭐ 写评价</div>
+                    <div class="notebook-item-content">
+                        <strong>标题偏好：</strong>星级+推荐理由<br>
+                        <strong>内容特点：</strong>结构化（口味/环境/性价比）、emoji使用
+                    </div>
+                </div>
+                <div class="notebook-item">
+                    <div class="notebook-item-date">📔 发笔记</div>
+                    <div class="notebook-item-content">
+                        <strong>标题偏好：</strong>感叹号、emoji、种草语气<br>
+                        <strong>内容特点：</strong>话题标签、图片感、情绪化表达
+                    </div>
+                </div>
+                <div class="notebook-item">
+                    <div class="notebook-item-date">❤️ 标记好去处</div>
+                    <div class="notebook-item-content">
+                        <strong>标题偏好：</strong>收藏、清单式<br>
+                        <strong>内容特点：</strong>推荐理由、地址信息、适合人群
+                    </div>
+                </div>
+            `;
+        }
+
+        // 切换公式标签
+        function switchFormulaTab(tab) {
+            document.querySelectorAll('.formula-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            document.getElementById('modalBody').innerHTML = getFormulaContent(tab);
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('notebookModal').classList.remove('show');
+        }
+
+        // 显示提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 初始化
+        switchStep(1);
+        updateGeneratedExamples();
+
+        // 设置默认日期
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('reflectionStartDate').value = today;
+        document.getElementById('reflectionEndDate').value = today;
+    </script>
+</body>
+</html>

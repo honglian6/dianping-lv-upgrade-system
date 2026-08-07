@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容创作能力提升系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部标题 -->
+        <header class="header">
+            <h1>📝 大众点评内容创作能力提升系统</h1>
+            <p>通过「看→写→反思」的循环，不断提升你的内容创作能力</p>
+        </header>
+
+        <!-- 内容类型选择器 -->
+        <div class="content-types">
+            <div class="content-type active" data-type="review" data-name="写评价">
+                <div class="content-type-icon">⭐</div>
+                <div class="content-type-name">写评价</div>
+                <div class="content-type-desc">详细点评，分享体验</div>
+            </div>
+            <div class="content-type" data-type="note" data-name="发笔记">
+                <div class="content-type-icon">📔</div>
+                <div class="content-type-name">发笔记</div>
+                <div class="content-type-desc">图文内容，种草分享</div>
+            </div>
+            <div class="content-type" data-type="favorite" data-name="标记好去处">
+                <div class="content-type-icon">❤️</div>
+                <div class="content-type-name">标记好去处</div>
+                <div class="content-type-desc">收藏整理，推荐给他人</div>
+            </div>
+        </div>
+
+        <!-- 循环进度 -->
+        <div class="progress-ring">
+            <div class="progress-item">
+                <div class="progress-circle active" data-step="1">👀</div>
+                <div class="progress-label">看（学习）</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-circle" data-step="2">✍️</div>
+                <div class="progress-label">写（实战）</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-circle" data-step="3">🤔</div>
+                <div class="progress-label">反思（沉淀）</div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧：操作区 -->
+            <div class="content-panel">
+                <!-- 步骤1：看 -->
+                <div id="step1" class="step-view active">
+                    <div class="panel-title">
+                        <span class="icon">👀</span>
+                        看一篇<span class="type-name">写评价</span>爆款，提取公式
+                    </div>
+                    <p class="panel-desc">
+                        找一篇你觉得好的<span class="type-name">写评价</span>内容，粘贴到下方，AI帮你提取可复用的公式。
+                    </p>
+
+                    <!-- 上传方式选择 -->
+                    <div class="upload-methods">
+                        <button class="method-btn active" data-method="paste">📝 粘贴内容</button>
+                        <button class="method-btn" data-method="link">🔗 粘贴链接</button>
+                    </div>
+
+                    <!-- 粘贴内容方式 -->
+                    <div id="pasteMethod" class="method-content active">
+                        <textarea id="analyzeInput" placeholder="粘贴一篇你觉得好的内容到这里..."></textarea>
+                    </div>
+
+                    <!-- 粘贴链接方式 -->
+                    <div id="linkMethod" class="method-content">
+                        <input type="text" id="linkInput" placeholder="粘贴大众点评链接，例如：https://www.dianping.com/...">
+                        <p class="link-tip">
+                            💡 小提示：由于平台限制，请点击链接后复制内容，再粘贴到上方分析
+                            <br>
+                            <a href="#" id="copyFromLinkBtn" class="link-action">📋 我已复制内容，粘贴过来</a>
+                        </p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-ai" id="aiExtractBtn">🤖 AI一键提取</button>
+                    </div>
+
+                    <!-- AI分析结果 -->
+                    <div id="aiResult" class="ai-result" style="display: none;">
+                        <h4>AI分析结果：</h4>
+                        <div class="ai-result-content">
+                            <div class="ai-result-item">
+                                <label>📌 标题公式</label>
+                                <textarea id="aiTitle"></textarea>
+                            </div>
+                            <div class="ai-result-item">
+                                <label>📖 开头套路</label>
+                                <textarea id="aiOpening"></textarea>
+                            </div>
+                            <div class="ai-result-item">
+                                <label>📐 结构框架</label>
+                                <textarea id="aiStructure"></textarea>
+                            </div>
+                            <div class="ai-result-item">
+                                <label>✨ 亮点技巧</label>
+                                <textarea id="aiHighlight"></textarea>
+                            </div>
+                        </div>
+                        <div class="ai-result-actions">
+                            <button class="btn btn-secondary" id="editFormulaBtn">✏️ 手动编辑</button>
+                            <button class="btn btn-success" id="saveAiFormulaBtn">💾 保存全部到公式库</button>
+                        </div>
+                    </div>
+
+                    <!-- 手动输入 -->
+                    <div id="manualInput" class="manual-input">
+                        <div class="formula-categories">
+                            <div class="formula-category selected" data-category="title">📌 标题公式</div>
+                            <div class="formula-category" data-category="opening">📖 开头套路</div>
+                            <div class="formula-category" data-category="structure">📐 结构框架</div>
+                            <div class="formula-category" data-category="highlight">✨ 亮点技巧</div>
+                        </div>
+
+                        <div class="formula-input-section">
+                            <label>提取的公式：</label>
+                            <textarea id="formulaContent" placeholder="描述你发现的公式，例如：数字+疑问+结论..."></textarea>
+                        </div>
+
+                        <button class="btn btn-primary" id="saveFormulaBtn">💾 保存到公式库</button>
+                    </div>
+                </div>
+
+                <!-- 步骤2：写 -->
+                <div id="step2" class="write-form">
+                    <div class="panel-title">
+                        <span class="icon">✍️</span>
+                        写一篇<span class="type-name">写评价</span>
+                    </div>
+                    <p class="panel-desc">
+                        告诉系统你的探店体验，系统会根据公式库生成内容。
+                    </p>
+                    <div class="write-form-content">
+                        <div class="form-group">
+                            <label>店铺/地点名称</label>
+                            <input type="text" id="venueName" placeholder="例如：巷子里的小火锅">
+                        </div>
+                        <div class="form-group">
+                            <label>位置</label>
+                            <input type="text" id="venueLocation" placeholder="例如：老城区建设路">
+                        </div>
+                        <div class="form-group">
+                            <label>体验关键词（用逗号分隔）</label>
+                            <textarea id="experienceKeywords" placeholder="例如：味道不错,锅底很香,牛肉新鲜,环境有烟火气,人均85,排队久"></textarea>
+                        </div>
+
+                        <div id="generatedContent" class="generated-content" style="display: none;">
+                            <h4>生成的内容：</h4>
+                            <div id="generatedText" class="generated-text"></div>
+                            <div class="generated-actions">
+                                <button class="btn btn-secondary" id="copyBtn">📋 复制</button>
+                                <button class="btn btn-success" id="saveWorkBtn">💾 保存作品</button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="generateBtn">🤖 生成内容</button>
+                    </div>
+                </div>
+
+                <!-- 步骤3：反思 -->
+                <div id="step3" class="reflect-form">
+                    <div class="panel-title">
+                        <span class="icon">🤔</span>
+                        写完了，简单反思一下
+                    </div>
+                    <p class="panel-desc">
+                        写完后的反思能让你更了解自己的写作风格，每次反思都是进步。
+                    </p>
+
+                    <div class="reflect-form-content">
+                        <div class="form-group">
+                            <label>反思的文章来源</label>
+                            <select id="reflectionSource">
+                                <option value="self">自己写的作品</option>
+                                <option value="template">套用公式生成的</option>
+                                <option value="ai">AI辅助完成的</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>1. 这篇你最满意哪个部分？</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="satisfy1" value="title">
+                                    <label for="satisfy1">标题</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="satisfy2" value="opening">
+                                    <label for="satisfy2">开头</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="satisfy3" value="middle">
+                                    <label for="satisfy3">中间描述</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="satisfy4" value="ending">
+                                    <label for="satisfy4">结尾</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>2. 写起来哪个部分最顺手？</label>
+                            <input type="text" id="smoothPart" placeholder="例如：结尾写得比较快">
+                        </div>
+                        <div class="form-group">
+                            <label>3. 有没有觉得哪里还不够好？下次想尝试什么？</label>
+                            <textarea id="improveIdea" placeholder="例如：中间描述感觉有点干，下次想加些具体的细节"></textarea>
+                        </div>
+                        <button class="btn btn-success" id="saveReflectionBtn">💾 保存反思</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：记录本 -->
+            <div class="notebooks">
+                <div class="notebook" data-notebook="examples">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">📖</span>
+                        <span class="notebook-name">优秀案例</span>
+                        <span class="notebook-count">3 篇</span>
+                    </div>
+                    <div class="notebook-preview">看看别人是怎么写的，找找灵感...</div>
+                </div>
+                <div class="notebook" data-notebook="formula">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">📚</span>
+                        <span class="notebook-name">公式库</span>
+                        <span class="notebook-count" id="formulaCount">0 条</span>
+                    </div>
+                    <div class="notebook-preview">标题公式、开头套路、结构框架、亮点技巧...</div>
+                </div>
+                <div class="notebook" data-notebook="works">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">📝</span>
+                        <span class="notebook-name">作品记录</span>
+                        <span class="notebook-count" id="worksCount">0 篇</span>
+                    </div>
+                    <div class="notebook-preview">每篇作品的发布时间、数据、你的评分...</div>
+                </div>
+                <div class="notebook" data-notebook="growth">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">🌱</span>
+                        <span class="notebook-name">成长日记</span>
+                        <span class="notebook-count" id="growthCount">0 条</span>
+                    </div>
+                    <div class="notebook-preview">每次反思的记录，文章来源、时间范围...</div>
+                </div>
+                <div class="notebook" data-notebook="style">
+                    <div class="notebook-header">
+                        <span class="notebook-icon">🎨</span>
+                        <span class="notebook-name">风格总结</span>
+                        <span class="notebook-count">3 个维度</span>
+                    </div>
+                    <div class="notebook-preview">评价、笔记、好去处各自的风格画像</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 模态框：查看记录本 -->
+    <div id="notebookModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">记录本</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+
+            <!-- 公式库：显示分类标签 -->
+            <div id="formulaTabs" class="formula-tabs" style="display: none;">
+                <div class="formula-tab active" data-tab="all">全部</div>
+                <div class="formula-tab" data-tab="title">标题公式</div>
+                <div class="formula-tab" data-tab="opening">开头套路</div>
+                <div class="formula-tab" data-tab="structure">结构框架</div>
+                <div class="formula-tab" data-tab="highlight">亮点技巧</div>
+            </div>
+
+            <div id="modalBody" class="modal-body">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示框 -->
+    <div id="toast" class="toast">✓ 已保存</div>
+
+    <!-- 引入JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/examples.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
