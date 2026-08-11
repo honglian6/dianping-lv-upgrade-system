@@ -3,7 +3,7 @@
  * 负责localStorage的数据读写操作
  */
 
-const STORAGE_KEY = 'contentCreationSystem';
+const STORAGE_KEY = 'lvUpgradeSystem';
 
 /**
  * 初始化数据结构
@@ -21,8 +21,7 @@ function initStorage() {
             reflections: [],
             styles: {
                 review: { title: [], opening: [], content: [], emotion: '' },
-                note: { title: [], opening: [], content: [], emotion: '' },
-                favorite: { title: [], opening: [], content: [], emotion: '' }
+                note: { title: [], opening: [], content: [], emotion: '' }
             }
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
@@ -47,18 +46,19 @@ function saveData(data) {
 /**
  * 保存公式到公式库
  */
-function saveFormula(category, content) {
+function saveFormula(category, content, contentType = 'review') {
     const data = getData();
     const formula = {
         id: Date.now(),
         content: content,
         type: category,
+        contentType: contentType,
         createdAt: new Date().toISOString(),
         count: 1
     };
 
     // 检查是否已存在相同内容
-    const existing = data.formulas[category].find(f => f.content === content);
+    const existing = data.formulas[category].find(f => f.content === content && f.contentType === contentType);
     if (existing) {
         existing.count++;
         existing.lastUsed = new Date().toISOString();
@@ -101,10 +101,14 @@ function saveWork(work) {
     const newWork = {
         id: Date.now(),
         type: work.type,
-        venueName: work.venueName,
-        location: work.location,
         content: work.content,
-        keywords: work.keywords,
+        // 评价特有的字段
+        experience: work.experience || null,
+        requirements: work.requirements || null,
+        link: work.link || null,
+        // 笔记特有的字段
+        baseReview: work.baseReview || null,
+        baseReviewId: work.baseReviewId || null,
         createdAt: new Date().toISOString(),
         views: 0,
         likes: 0,
@@ -142,7 +146,6 @@ function saveReflection(reflection) {
     const newReflection = {
         id: Date.now(),
         type: reflection.type,
-        source: reflection.source,
         satisfiedParts: reflection.satisfiedParts,
         smoothPart: reflection.smoothPart,
         improveIdea: reflection.improveIdea,

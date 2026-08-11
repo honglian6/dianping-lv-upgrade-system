@@ -61,7 +61,7 @@ body {
 /* ==================== 内容类型选择器 ==================== */
 .content-types {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin-bottom: 20px;
 }
@@ -625,6 +625,27 @@ select:focus {
     color: #7f8c8d;
 }
 
+.notebook-add-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #27ae60;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+
+.notebook-add-btn:hover {
+    background: #229954;
+    transform: scale(1.1);
+}
+
 .notebook-preview {
     font-size: 13px;
     color: #95a5a6;
@@ -915,4 +936,296 @@ select:focus {
     .notebook {
         padding: 12px;
     }
+}
+
+/* ==================== 初始提示样式 ==================== */
+.initial-hint {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-top: 20px;
+}
+
+.hint-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.hint-icon {
+    font-size: 48px;
+}
+
+.hint-content p {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+/* ==================== 类型模块 ==================== */
+.type-module {
+    width: 100%;
+}
+
+.type-module[style*="display: none"] {
+    display: none !important;
+}
+
+/* ==================== 内容分析区域 ==================== */
+.content-with-analysis {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.generated-content-main {
+    min-width: 0;
+}
+
+.content-analysis {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 3px solid #3498db;
+}
+
+.content-analysis h5 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.analysis-section {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.analysis-section:last-child {
+    margin-bottom: 0;
+}
+
+.analysis-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+.analysis-value {
+    font-size: 13px;
+    color: #2c3e50;
+}
+
+/* ==================== 语音输入区域 ==================== */
+.input-methods {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.voice-input-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+#voiceStatus {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* ==================== 笔记生成区域 ==================== */
+.note-generate-area {
+    width: 100%;
+}
+
+.no-review-hint {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.no-review-hint .hint-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.no-review-hint p {
+    color: #7f8c8d;
+    margin-bottom: 16px;
+}
+
+.confirmed-review {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.review-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7f8c8d;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.base-review-text {
+    font-size: 13px;
+    color: #2c3e50;
+    line-height: 1.5;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+/* ==================== 修改建议区域 ==================== */
+.modify-section {
+    background: #fff3cd;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+.modify-section h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #856404;
+}
+
+.modify-section textarea {
+    min-height: 60px;
+    margin-bottom: 8px;
+}
+
+/* ==================== 响应式调整 ==================== */
+@media (max-width: 768px) {
+    .content-with-analysis {
+        grid-template-columns: 1fr;
+    }
+
+    .content-analysis {
+        order: -1;
+    }
+}
+
+/* ==================== 提交链接区域 ==================== */
+.submit-link-area {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.submit-link-area h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+}
+
+/* ==================== 提示操作按钮 ==================== */
+.hint-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+/* ==================== 选择评价记录区域 ==================== */
+.select-review-area {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.select-review-area h4 {
+    margin: 0 0 16px 0;
+    color: #2c3e50;
+}
+
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.review-item {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid #ff6b6b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.review-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.review-item-date {
+    font-size: 12px;
+    color: #95a5a6;
+    margin-bottom: 8px;
+}
+
+.review-item-content {
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.5;
+}
+
+.review-item-link {
+    font-size: 12px;
+    color: #3498db;
+    margin-top: 8px;
+    word-break: break-all;
+}
+
+/* ==================== 补录表单样式 ==================== */
+.add-review-form {
+    padding: 16px 0;
+}
+
+.add-review-form .form-group {
+    margin-bottom: 16px;
+}
+
+.add-review-form .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.add-review-form textarea,
+.add-review-form input[type="text"],
+.add-review-form input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.add-review-form textarea:focus,
+.add-review-form input:focus {
+    outline: none;
+    border-color: #ff6b6b;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
 }
