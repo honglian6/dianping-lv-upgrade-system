@@ -1,0 +1,1231 @@
+/* ==================== 全局样式 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ==================== 顶部标题 ==================== */
+.header {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.config-btn {
+    background: #f8f9fa;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.config-btn:hover {
+    background: #e9ecef;
+}
+
+/* ==================== 内容类型选择器 ==================== */
+.content-types {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.content-type {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.content-type:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.content-type.active {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+}
+
+.content-type-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.content-type-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #2c3e50;
+}
+
+.content-type-desc {
+    font-size: 12px;
+    color: #95a5a6;
+    margin-top: 4px;
+}
+
+/* ==================== 循环进度 ==================== */
+.progress-ring {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.progress-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.progress-item:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bdc3c7;
+    font-size: 20px;
+}
+
+.progress-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #ecf0f1;
+    color: #95a5a6;
+}
+
+.progress-circle.active {
+    background: #ff6b6b;
+    color: white;
+}
+
+.progress-circle.completed {
+    background: #27ae60;
+    color: white;
+}
+
+.progress-label {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* ==================== 主内容区 ==================== */
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.content-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-title .icon {
+    font-size: 20px;
+}
+
+.panel-desc {
+    color: #7f8c8d;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.type-name {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+/* ==================== 步骤视图 ==================== */
+.step-view,
+.write-form,
+.reflect-form {
+    display: none;
+}
+
+.step-view.active,
+.write-form.active,
+.reflect-form.active {
+    display: block;
+}
+
+/* ==================== 表单元素 ==================== */
+textarea,
+input[type="text"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus {
+    outline: none;
+    border-color: #ff6b6b;
+}
+
+#analyzeInput {
+    min-height: 120px;
+    margin-bottom: 12px;
+}
+
+#formulaContent {
+    min-height: 80px;
+    margin-bottom: 16px;
+}
+
+#experienceKeywords {
+    min-height: 80px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+/* ==================== 上传方式选择 ==================== */
+.upload-methods {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.method-btn {
+    padding: 8px 16px;
+    border: 2px solid #e0e0e0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.method-btn:hover {
+    border-color: #ff6b6b;
+}
+
+.method-btn.active {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+    color: #ff6b6b;
+}
+
+.method-content {
+    display: none;
+}
+
+.method-content.active {
+    display: block;
+}
+
+.link-tip {
+    margin-top: 8px;
+    padding: 12px;
+    background: #fff3cd;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #856404;
+}
+
+.link-action {
+    color: #ff6b6b;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.link-action:hover {
+    color: #ff5252;
+}
+
+/* ==================== 优秀案例样式 ==================== */
+.example-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.example-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.example-type {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.example-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.example-content {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    line-height: 1.8;
+}
+
+.example-analysis {
+    margin-top: 12px;
+}
+
+.example-analysis details {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.example-analysis summary {
+    padding: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.example-analysis summary:hover {
+    background: #f8f9fa;
+}
+
+.analysis-details {
+    padding: 12px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.analysis-details p {
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.analysis-details strong {
+    color: #2c3e50;
+}
+
+/* ==================== 按钮样式 ==================== */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-primary {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #ff5252;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+.btn-success {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #229954;
+}
+
+.btn-ai {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-ai:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+/* ==================== AI相关样式 ==================== */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.ai-result {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.ai-result h4 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+}
+
+.ai-result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ai-result-item label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.ai-result-item textarea {
+    min-height: 60px;
+    padding: 8px;
+    font-size: 13px;
+}
+
+.ai-result-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.manual-input {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* ==================== 公式分类选择 ==================== */
+.formula-categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.formula-category {
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 2px solid #e0e0e0;
+    background: white;
+    transition: all 0.2s;
+}
+
+.formula-category:hover {
+    border-color: #ff6b6b;
+}
+
+.formula-category.selected {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+    color: #ff6b6b;
+}
+
+/* ==================== 生成内容区域 ==================== */
+.generated-content {
+    margin-top: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.generated-content h4 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+}
+
+.generated-text {
+    background: white;
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 3px solid #ff6b6b;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    margin-bottom: 12px;
+}
+
+.generated-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ==================== 复选框组 ==================== */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+}
+
+.checkbox-item label {
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ==================== 右侧记录本 ==================== */
+.notebooks {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notebook {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.notebook:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.notebook-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.notebook-icon {
+    font-size: 20px;
+}
+
+.notebook-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.notebook-count {
+    margin-left: auto;
+    background: #ecf0f1;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #7f8c8d;
+}
+
+.notebook-add-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #27ae60;
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+
+.notebook-add-btn:hover {
+    background: #229954;
+    transform: scale(1.1);
+}
+
+.notebook-preview {
+    font-size: 13px;
+    color: #95a5a6;
+    line-height: 1.4;
+}
+
+/* ==================== 模态框 ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 700px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content.config-content {
+    max-width: 500px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #95a5a6;
+}
+
+.modal-close:hover {
+    color: #2c3e50;
+}
+
+/* ==================== 配置界面 ==================== */
+.config-desc {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.config-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.config-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* ==================== 公式库标签 ==================== */
+.formula-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.formula-tab {
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: #f8f9fa;
+    transition: all 0.2s;
+}
+
+.formula-tab:hover {
+    border-color: #ff6b6b;
+}
+
+.formula-tab.active {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+    color: #ff6b6b;
+}
+
+/* ==================== 记录本内容列表 ==================== */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notebook-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid #ff6b6b;
+}
+
+.notebook-item-date {
+    font-size: 12px;
+    color: #95a5a6;
+    margin-bottom: 4px;
+}
+
+.notebook-item-content {
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.5;
+}
+
+.notebook-item-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff3cd;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #856404;
+    margin-left: 8px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+/* ==================== 提示框 ==================== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #27ae60;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 2000;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.error {
+    background: #e74c3c;
+}
+
+/* ==================== 响应式设计 ==================== */
+@media (max-width: 768px) {
+    .container {
+        padding: 12px;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .header-top {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .content-types {
+        grid-template-columns: 1fr;
+    }
+
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .progress-item:not(:last-child)::after {
+        display: none;
+    }
+
+    .progress-ring {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .progress-item {
+        flex: 0 0 auto;
+        min-width: 80px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+
+    .ai-result-actions,
+    .generated-actions,
+    .config-actions {
+        flex-direction: column;
+    }
+
+    .ai-result-actions .btn,
+    .generated-actions .btn,
+    .config-actions .btn {
+        width: 100%;
+    }
+
+    .btn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 85vh;
+        padding: 20px;
+    }
+
+    .notebooks {
+        order: -1;
+        margin-bottom: 16px;
+    }
+
+    .formula-categories {
+        gap: 6px;
+    }
+
+    .formula-category {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* 手机端按钮优化 */
+@media (max-width: 480px) {
+    .progress-circle {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .content-type {
+        padding: 12px;
+    }
+
+    .content-type-icon {
+        font-size: 24px;
+    }
+
+    .notebook {
+        padding: 12px;
+    }
+}
+
+/* ==================== 初始提示样式 ==================== */
+.initial-hint {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-top: 20px;
+}
+
+.hint-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.hint-icon {
+    font-size: 48px;
+}
+
+.hint-content p {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+/* ==================== 类型模块 ==================== */
+.type-module {
+    width: 100%;
+}
+
+.type-module[style*="display: none"] {
+    display: none !important;
+}
+
+/* ==================== 内容分析区域 ==================== */
+.content-with-analysis {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.generated-content-main {
+    min-width: 0;
+}
+
+.content-analysis {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 3px solid #3498db;
+}
+
+.content-analysis h5 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.analysis-section {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.analysis-section:last-child {
+    margin-bottom: 0;
+}
+
+.analysis-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+.analysis-value {
+    font-size: 13px;
+    color: #2c3e50;
+}
+
+/* ==================== 语音输入区域 ==================== */
+.input-methods {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.voice-input-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+#voiceStatus {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* ==================== 笔记生成区域 ==================== */
+.note-generate-area {
+    width: 100%;
+}
+
+.no-review-hint {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.no-review-hint .hint-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.no-review-hint p {
+    color: #7f8c8d;
+    margin-bottom: 16px;
+}
+
+.confirmed-review {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.review-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7f8c8d;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.base-review-text {
+    font-size: 13px;
+    color: #2c3e50;
+    line-height: 1.5;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+/* ==================== 修改建议区域 ==================== */
+.modify-section {
+    background: #fff3cd;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 16px 0;
+}
+
+.modify-section h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #856404;
+}
+
+.modify-section textarea {
+    min-height: 60px;
+    margin-bottom: 8px;
+}
+
+/* ==================== 响应式调整 ==================== */
+@media (max-width: 768px) {
+    .content-with-analysis {
+        grid-template-columns: 1fr;
+    }
+
+    .content-analysis {
+        order: -1;
+    }
+}
+
+/* ==================== 提交链接区域 ==================== */
+.submit-link-area {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.submit-link-area h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+}
+
+/* ==================== 提示操作按钮 ==================== */
+.hint-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+/* ==================== 选择评价记录区域 ==================== */
+.select-review-area {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.select-review-area h4 {
+    margin: 0 0 16px 0;
+    color: #2c3e50;
+}
+
+.review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.review-item {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 3px solid #ff6b6b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.review-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.review-item-date {
+    font-size: 12px;
+    color: #95a5a6;
+    margin-bottom: 8px;
+}
+
+.review-item-content {
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.5;
+}
+
+.review-item-link {
+    font-size: 12px;
+    color: #3498db;
+    margin-top: 8px;
+    word-break: break-all;
+}
+
+/* ==================== 补录表单样式 ==================== */
+.add-review-form {
+    padding: 16px 0;
+}
+
+.add-review-form .form-group {
+    margin-bottom: 16px;
+}
+
+.add-review-form .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.add-review-form textarea,
+.add-review-form input[type="text"],
+.add-review-form input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.add-review-form textarea:focus,
+.add-review-form input:focus {
+    outline: none;
+    border-color: #ff6b6b;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
