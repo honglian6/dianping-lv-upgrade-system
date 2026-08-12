@@ -186,6 +186,8 @@ async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
         throw new Error('请先配置AI API Key');
     }
 
+    console.log('AI配置:', { provider: config.provider, model: config.model, baseURL: config.baseURL });
+
     let headers = {
         'Content-Type': 'application/json'
     };
@@ -193,8 +195,8 @@ async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
     let body = {};
     let endpoint = config.baseURL;
 
-    // 智谱AI Claude兼容模式和原生GLM模型都使用OpenAI格式
-    if (config.provider === 'claude-compatible' || config.provider === 'zhipu') {
+    // 智谱AI原生GLM模型使用OpenAI兼容格式
+    if (config.provider === 'zhipu') {
         headers['Authorization'] = `Bearer ${config.apiKey}`;
         endpoint += '/chat/completions';
         body = {
@@ -203,8 +205,9 @@ async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
             temperature: temperature,
             max_tokens: maxTokens
         };
+        console.log('智谱AI请求格式:', { endpoint, body: { ...body, messages: ['...'] } });
     } else if (config.provider === 'claude') {
-        // 真正的Claude API格式
+        // Claude API格式
         headers['x-api-key'] = config.apiKey;
         headers['anthropic-version'] = '2023-06-01';
         endpoint += '/messages';
@@ -212,15 +215,6 @@ async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
             model: config.model,
             max_tokens: maxTokens,
             messages: [{ role: 'user', content: prompt }]
-        };
-    } else if (config.provider === 'openai') {
-        headers['Authorization'] = `Bearer ${config.apiKey}`;
-        endpoint += '/chat/completions';
-        body = {
-            model: config.model,
-            messages: [{ role: 'user', content: prompt }],
-            temperature: temperature,
-            max_tokens: maxTokens
         };
     } else {
         // 默认使用智谱AI格式
@@ -234,18 +228,24 @@ async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
         };
     }
 
+    console.log('发送AI请求到:', endpoint);
+
     const response = await fetch(endpoint, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(body)
     });
 
+    console.log('AI响应状态:', response.status, response.statusText);
+
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || 'AI请求失败');
+        console.error('AI错误详情:', error);
+        throw new Error(error.error?.message || error.message || 'AI请求失败');
     }
 
     const data = await response.json();
+    console.log('AI响应数据:', data);
 
     // 根据不同provider返回内容
     if (config.provider === 'claude') {
