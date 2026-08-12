@@ -1366,54 +1366,6 @@ function initCloudSync() {
             console.log('同步失败，将使用本地数据');
         });
     }, 1000);
-
-    // 绑定AI配置按钮
-    document.getElementById('aiConfigBtn').addEventListener('click', openAiConfigModal);
-}
-
-/**
- * 打开AI配置模态框
- */
-function openAiConfigModal() {
-    const modal = document.getElementById('aiConfigModal');
-
-    // 加载现有配置
-    const config = getAIConfig();
-    if (config.apiKey) {
-        document.getElementById('aiApiKey').value = config.apiKey;
-        document.getElementById('aiModel').value = config.model || 'glm-4-flash';
-    }
-
-    modal.classList.add('show');
-
-    // 绑定保存按钮
-    document.getElementById('saveAiConfigBtn').onclick = saveAiConfig;
-}
-
-/**
- * 关闭AI配置模态框
- */
-function closeAiConfigModal() {
-    document.getElementById('aiConfigModal').classList.remove('show');
-}
-
-/**
- * 保存AI配置
- */
-function saveAiConfig() {
-    const apiKey = document.getElementById('aiApiKey').value.trim();
-    const model = document.getElementById('aiModel').value.trim() || 'glm-4-flash';
-
-    if (!apiKey) {
-        showToast('请输入API Key', 'error');
-        return;
-    }
-
-    // 保存配置
-    saveAIConfig(apiKey, null, model);
-
-    showToast('✓ AI配置已保存');
-    closeAiConfigModal();
 }
 
 /**
