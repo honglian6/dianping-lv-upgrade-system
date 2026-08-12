@@ -1,14 +1,46 @@
 /**
  * AI功能模块
- * 从config.js读取配置
+ * 支持多种AI服务：智谱AI、Claude、OpenAI等
  */
 
-// 从config.js读取配置，如果不存在则使用默认值
-let aiConfig = {
-    apiKey: '',
+// 默认配置（使用智谱AI的Claude API兼容模式）
+const DEFAULT_AI_CONFIG = {
+    apiKey: 'b6f8a671c5254c00ba546dbb4c2828e5.eCO79QyB8SmVBodV',
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-    model: 'glm-4-flash'
+    model: 'claude-3-5-sonnet-20241022',
+    provider: 'claude-compatible' // 智谱AI的Claude兼容模式
 };
+
+// AI服务预设配置
+const AI_PRESETS = {
+    'claude-compatible': {
+        name: 'Claude Code (智谱兼容)',
+        baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+        defaultModel: 'claude-3-5-sonnet-20241022',
+        description: '智谱AI Claude兼容模式，高质量Claude体验'
+    },
+    zhipu: {
+        name: '智谱AI原生',
+        baseURL: 'https://open.bigmodel.cn/api/paas/v4',
+        defaultModel: 'glm-4-plus',
+        description: '智谱AI原生GLM模型'
+    },
+    claude: {
+        name: 'Claude (Anthropic)',
+        baseURL: 'https://api.anthropic.com/v1',
+        defaultModel: 'claude-3-5-sonnet-20241022',
+        description: 'Claude官方API'
+    },
+    openai: {
+        name: 'OpenAI',
+        baseURL: 'https://api.openai.com/v1',
+        defaultModel: 'gpt-3.5-turbo',
+        description: '经典AI服务'
+    }
+};
+
+// 从config.js读取配置，如果不存在则使用默认值
+let aiConfig = { ...DEFAULT_AI_CONFIG };
 
 // 尝试加载配置（仅在浏览器环境中）
 try {
@@ -40,21 +72,32 @@ function getAIConfig() {
     return {
         apiKey: '',
         baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-        model: 'glm-4-flash'
+        model: 'glm-4-flash',
+        provider: 'zhipu'
     };
 }
 
 /**
  * 保存AI配置
  */
-function saveAIConfig(apiKey, baseURL, model) {
+function saveAIConfig(apiKey, provider, customBaseURL, customModel) {
+    const preset = AI_PRESETS[provider] || AI_PRESETS.zhipu;
+
     const config = {
         apiKey: apiKey,
-        baseURL: baseURL || 'https://open.bigmodel.cn/api/paas/v4',
-        model: model || 'glm-4-flash'
+        baseURL: customBaseURL || preset.baseURL,
+        model: customModel || preset.defaultModel,
+        provider: provider
     };
     localStorage.setItem(AI_CONFIG_KEY, JSON.stringify(config));
     return config;
+}
+
+/**
+ * 获取AI服务预设
+ */
+function getAIPresets() {
+    return AI_PRESETS;
 }
 
 /**
@@ -103,57 +146,112 @@ ${content}
 如果某项没有明显特征，请返回"暂无明显特征"。`;
 
     try {
-        const response = await fetch(`${config.baseURL}/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
-            },
-            body: JSON.stringify({
-                model: config.model,
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.7,
-                max_tokens: 1000
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'AI请求失败');
-        }
-
-        const data = await response.json();
-        const content_result = data.choices[0].message.content;
+        const result = await callAI(prompt, 0.7, 1000);
 
         // 尝试解析JSON
-        let result;
         try {
             // 清理可能的markdown代码块标记
-            const cleanContent = content_result
+            const cleanContent = result
                 .replace(/```json\n?/g, '')
                 .replace(/```\n?/g, '')
                 .trim();
-            result = JSON.parse(cleanContent);
+            return JSON.parse(cleanContent);
         } catch (e) {
             // 如果JSON解析失败，返回原始内容
-            result = {
+            return {
                 title: '解析失败',
                 opening: '解析失败',
                 structure: '解析失败',
                 highlight: '解析失败',
-                raw: content_result
+                raw: result
             };
         }
-
-        return result;
     } catch (error) {
         console.error('AI分析失败:', error);
         throw error;
+    }
+}
+
+/**
+ * 统一AI调用接口（支持智谱AI Claude兼容模式）
+ * @param {string} prompt - 提示词
+ * @param {number} temperature - 温度参数
+ * @param {number} maxTokens - 最大token数
+ * @returns {Promise<string>} - AI返回的内容
+ */
+async function callAI(prompt, temperature = 0.7, maxTokens = 1000) {
+    const config = getAIConfig();
+
+    if (!config.apiKey) {
+        throw new Error('请先配置AI API Key');
+    }
+
+    let headers = {
+        'Content-Type': 'application/json'
+    };
+
+    let body = {};
+    let endpoint = config.baseURL;
+
+    // 智谱AI Claude兼容模式和原生GLM模型都使用OpenAI格式
+    if (config.provider === 'claude-compatible' || config.provider === 'zhipu') {
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
+        endpoint += '/chat/completions';
+        body = {
+            model: config.model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: temperature,
+            max_tokens: maxTokens
+        };
+    } else if (config.provider === 'claude') {
+        // 真正的Claude API格式
+        headers['x-api-key'] = config.apiKey;
+        headers['anthropic-version'] = '2023-06-01';
+        endpoint += '/messages';
+        body = {
+            model: config.model,
+            max_tokens: maxTokens,
+            messages: [{ role: 'user', content: prompt }]
+        };
+    } else if (config.provider === 'openai') {
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
+        endpoint += '/chat/completions';
+        body = {
+            model: config.model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: temperature,
+            max_tokens: maxTokens
+        };
+    } else {
+        // 默认使用智谱AI格式
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
+        endpoint += '/chat/completions';
+        body = {
+            model: config.model,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: temperature,
+            max_tokens: maxTokens
+        };
+    }
+
+    const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || 'AI请求失败');
+    }
+
+    const data = await response.json();
+
+    // 根据不同provider返回内容
+    if (config.provider === 'claude') {
+        return data.content[0].text;
+    } else {
+        return data.choices[0].message.content;
     }
 }
 
@@ -163,12 +261,6 @@ ${content}
  * @returns {Promise<string>} - 生成的内容
  */
 async function generateReviewByAI(params) {
-    const config = getAIConfig();
-
-    if (!config.apiKey) {
-        throw new Error('请先配置AI API Key');
-    }
-
     const prompt = `你是一个优质的内容创作者，擅长写大众点评评价。
 
 请根据以下真实体验，生成一篇优质评价：
@@ -182,40 +274,11 @@ ${params.requirements ? `【写作要求】${params.requirements}` : ''}
 3. 以真实体验的感觉来写，语气真诚
 4. 突出体验的真实感受
 5. 有推荐倾向
+6. 语言生动，有感染力
 
 直接返回生成的内容，不要有任何解释。`;
 
-    try {
-        const response = await fetch(`${config.baseURL}/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
-            },
-            body: JSON.stringify({
-                model: config.model,
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.8,
-                max_tokens: 500
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'AI请求失败');
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('AI生成失败:', error);
-        throw error;
-    }
+    return await callAI(prompt, 0.8, 500);
 }
 
 /**
@@ -224,12 +287,6 @@ ${params.requirements ? `【写作要求】${params.requirements}` : ''}
  * @returns {Promise<string>} - 生成的内容
  */
 async function generateNoteByAI(baseReview) {
-    const config = getAIConfig();
-
-    if (!config.apiKey) {
-        throw new Error('请先配置AI API Key');
-    }
-
     const prompt = `你是一个优质的内容创作者，擅长写大众点评笔记（探店模式）。
 
 请基于以下评价内容，自动生成一篇探店模式的笔记：
@@ -245,40 +302,11 @@ ${baseReview}
 5. 结尾要有地址信息（模板形式）
 6. 添加话题标签，如 #探店 #美食 #宝藏小店 #周末去哪儿
 7. 符合探店分享的特点
+8. 语言生动有趣，有感染力
 
 直接返回生成的内容，不要有任何解释。`;
 
-    try {
-        const response = await fetch(`${config.baseURL}/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
-            },
-            body: JSON.stringify({
-                model: config.model,
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.8,
-                max_tokens: 1500
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'AI请求失败');
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('AI生成失败:', error);
-        throw error;
-    }
+    return await callAI(prompt, 0.8, 1500);
 }
 
 /**
@@ -288,12 +316,6 @@ ${baseReview}
  * @returns {Promise<string>} - 修改后的内容
  */
 async function modifyNoteByAI(currentContent, suggestion) {
-    const config = getAIConfig();
-
-    if (!config.apiKey) {
-        throw new Error('请先配置AI API Key');
-    }
-
     const prompt = `你是一个优质的内容创作者，擅长根据建议修改笔记内容。
 
 【当前笔记内容】
@@ -306,35 +328,5 @@ ${suggestion}
 
 直接返回修改后的内容，不要有任何解释。`;
 
-    try {
-        const response = await fetch(`${config.baseURL}/chat/completions`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${config.apiKey}`
-            },
-            body: JSON.stringify({
-                model: config.model,
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ],
-                temperature: 0.8,
-                max_tokens: 1500
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error?.message || 'AI请求失败');
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    } catch (error) {
-        console.error('AI修改失败:', error);
-        throw error;
-    }
+    return await callAI(prompt, 0.8, 1500);
 }
