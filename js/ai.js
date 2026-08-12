@@ -3,12 +3,12 @@
  * 支持多种AI服务：智谱AI、Claude、OpenAI等
  */
 
-// 默认配置（使用智谱AI的Claude API兼容模式）
+// 默认配置（使用智谱AI的GLM-4-Plus模型）
 const DEFAULT_AI_CONFIG = {
     apiKey: 'b6f8a671c5254c00ba546dbb4c2828e5.eCO79QyB8SmVBodV',
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-    model: 'claude-3-5-sonnet-20241022',
-    provider: 'claude-compatible' // 智谱AI的Claude兼容模式
+    model: 'glm-4-plus',
+    provider: 'zhipu' // 智谱AI原生模型
 };
 
 // AI服务预设配置
