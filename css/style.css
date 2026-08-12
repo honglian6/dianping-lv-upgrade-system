@@ -1229,3 +1229,213 @@ select:focus {
     justify-content: flex-end;
     margin-top: 24px;
 }
+
+/* ==================== 云端同步状态 ==================== */
+.cloud-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 100;
+    animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.cloud-status-icon {
+    font-size: 18px;
+}
+
+.cloud-status-text {
+    font-size: 13px;
+    color: #2c3e50;
+}
+
+.cloud-config-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.cloud-config-btn:hover {
+    background: #f8f9fa;
+}
+
+/* ==================== 云端配置模态框 ==================== */
+.modal-small {
+    max-width: 500px !important;
+}
+
+.cloud-config-content {
+    padding: 16px 0;
+}
+
+.config-section {
+    margin-bottom: 24px;
+}
+
+.config-section h4 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #2c3e50;
+}
+
+.config-section p {
+    font-size: 14px;
+    color: #7f8c8d;
+    line-height: 1.6;
+}
+
+.config-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+}
+
+.config-steps li {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.config-steps li::before {
+    content: attr(data-counter);
+    position: absolute;
+    left: 0;
+    background: #ff6b6b;
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+}
+
+.config-steps code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #e74c3c;
+}
+
+.config-steps a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.config-steps a:hover {
+    text-decoration: underline;
+}
+
+.cloud-config-status {
+    padding: 16px 0;
+}
+
+.status-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.status-item:last-child {
+    border-bottom: none;
+}
+
+.status-label {
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
+.status-value {
+    font-size: 13px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* ==================== 同步提示 ==================== */
+.sync-toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 16px 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3000;
+}
+
+.sync-icon {
+    font-size: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.sync-text {
+    font-size: 14px;
+}
+
+/* ==================== 云端状态响应式 ==================== */
+@media (max-width: 768px) {
+    .cloud-status {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+    }
+
+    .cloud-status-text {
+        font-size: 12px;
+    }
+
+    .modal-small {
+        max-width: 95% !important;
+    }
+
+    .config-steps li {
+        font-size: 12px;
+    }
+}
