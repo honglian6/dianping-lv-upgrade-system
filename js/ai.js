@@ -3,12 +3,12 @@
  * 支持多种AI服务：智谱AI、Claude、OpenAI等
  */
 
-// 默认配置（使用智谱AI的GLM-4-Plus模型）
+// 默认配置（使用智谱AI的GLM-4模型）
 const DEFAULT_AI_CONFIG = {
     apiKey: 'b6f8a671c5254c00ba546dbb4c2828e5.eCO79QyB8SmVBodV',
     baseURL: 'https://open.bigmodel.cn/api/paas/v4',
-    model: 'glm-4-plus',
-    provider: 'zhipu' // 智谱AI原生模型
+    model: 'glm-4', // 使用标准的GLM-4模型
+    provider: 'zhipu'
 };
 
 // AI服务预设配置
