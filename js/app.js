@@ -484,7 +484,15 @@ async function generateReview() {
     try {
         // 检查AI配置
         if (!hasAIConfig()) {
-            throw new Error('请先配置AI API Key');
+            showToast('请先配置AI（点击右上角🤖按钮）', 'error');
+            // 使用备用模板
+            const content = generateReviewByTemplate(experience, requirements);
+            document.getElementById('generatedReviewText').textContent = content;
+            document.getElementById('generatedReview').style.display = 'block';
+            analyzeReviewContent(content);
+            btn.disabled = false;
+            btn.textContent = '🤖 生成评价';
+            return;
         }
 
         // 调用AI生成评价内容
@@ -512,7 +520,7 @@ async function generateReview() {
         // 分析内容
         analyzeReviewContent(content);
 
-        showToast('AI生成失败，已使用备用模板', 'error');
+        showToast('AI生成失败，已使用内置模板', 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = '🤖 生成评价';
@@ -776,7 +784,14 @@ async function generateNote() {
     try {
         // 检查AI配置
         if (!hasAIConfig()) {
-            throw new Error('请先配置AI API Key');
+            showToast('请先配置AI（点击右上角🤖按钮）', 'error');
+            // 使用备用模板
+            const content = generateNoteByTemplate(confirmedReview);
+            document.getElementById('generatedNoteText').textContent = content;
+            document.getElementById('generatedNote').style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = '🤖 自动生成笔记';
+            return;
         }
 
         // 调用AI生成笔记内容（基于评价内容，探店模式）
@@ -793,7 +808,7 @@ async function generateNote() {
         document.getElementById('generatedNoteText').textContent = content;
         document.getElementById('generatedNote').style.display = 'block';
 
-        showToast('AI生成失败，已使用备用模板', 'error');
+        showToast('AI生成失败，已使用内置模板', 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = '🤖 自动生成笔记';
@@ -1046,18 +1061,40 @@ function renderWorks() {
 
     return works.reverse().map(work => {
         const date = new Date(work.createdAt).toLocaleDateString('zh-CN');
-        const preview = work.content.substring(0, 50);
         return `
             <div class="notebook-item">
                 <div class="notebook-item-date">${date} · ${typeNames[work.type] || work.type}</div>
                 <div class="notebook-item-content">
-                    ${work.type === 'review' ? `<strong>评价内容</strong>` : `<strong>笔记内容</strong>`}
-                    <br><small style="color:#7f8c8d;margin-top:4px;display:block;">${preview}...</small>
-                    ${work.link ? `<br><small style="color:#3498db;margin-top:4px;">🔗 <a href="${work.link}" target="_blank">查看大众点评链接</a></small>` : ''}
+                    <div class="work-content">${work.content}</div>
+                    ${work.link ? `<div style="margin-top:8px;"><small style="color:#3498db;">🔗 <a href="${work.link}" target="_blank">查看大众点评链接</a></small></div>` : ''}
                 </div>
+                <button class="btn-copy-work" onclick="copyWorkContent(${work.id})" style="margin-top:8px;padding:4px 12px;font-size:12px;background:#ecf0f1;border:none;border-radius:4px;cursor:pointer;">📋 复制内容</button>
             </div>
         `;
     }).join('');
+}
+
+/**
+ * 复制作品内容
+ */
+function copyWorkContent(workId) {
+    const works = getWorksFromStorage();
+    const work = works.find(w => w.id === workId);
+
+    if (work) {
+        navigator.clipboard.writeText(work.content).then(() => {
+            showToast('✓ 已复制到剪贴板');
+        }).catch(() => {
+            // 降级方案
+            const textarea = document.createElement('textarea');
+            textarea.value = work.content;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('✓ 已复制到剪贴板');
+        });
+    }
 }
 
 /**
@@ -1329,6 +1366,54 @@ function initCloudSync() {
             console.log('同步失败，将使用本地数据');
         });
     }, 1000);
+
+    // 绑定AI配置按钮
+    document.getElementById('aiConfigBtn').addEventListener('click', openAiConfigModal);
+}
+
+/**
+ * 打开AI配置模态框
+ */
+function openAiConfigModal() {
+    const modal = document.getElementById('aiConfigModal');
+
+    // 加载现有配置
+    const config = getAIConfig();
+    if (config.apiKey) {
+        document.getElementById('aiApiKey').value = config.apiKey;
+        document.getElementById('aiModel').value = config.model || 'glm-4-flash';
+    }
+
+    modal.classList.add('show');
+
+    // 绑定保存按钮
+    document.getElementById('saveAiConfigBtn').onclick = saveAiConfig;
+}
+
+/**
+ * 关闭AI配置模态框
+ */
+function closeAiConfigModal() {
+    document.getElementById('aiConfigModal').classList.remove('show');
+}
+
+/**
+ * 保存AI配置
+ */
+function saveAiConfig() {
+    const apiKey = document.getElementById('aiApiKey').value.trim();
+    const model = document.getElementById('aiModel').value.trim() || 'glm-4-flash';
+
+    if (!apiKey) {
+        showToast('请输入API Key', 'error');
+        return;
+    }
+
+    // 保存配置
+    saveAIConfig(apiKey, null, model);
+
+    showToast('✓ AI配置已保存');
+    closeAiConfigModal();
 }
 
 /**

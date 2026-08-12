@@ -1439,3 +1439,36 @@ select:focus {
         font-size: 12px;
     }
 }
+
+/* ==================== 作品内容样式 ==================== */
+.work-content {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 3px solid #ff6b6b;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.btn-copy-work {
+    background: #ecf0f1 !important;
+    border: none !important;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.btn-copy-work:hover {
+    background: #d5dbdb !important;
+}
+
+/* ==================== AI配置样式 ==================== */
+.ai-config-content {
+    padding: 16px 0;
+}
