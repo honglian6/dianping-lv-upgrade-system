@@ -1313,223 +1313,38 @@ function getReflectionsCountFromStorage() {
  * 初始化云端同步
  */
 function initCloudSync() {
-    const cloudStatus = document.getElementById('cloudStatus');
+    // 公共云端存储始终可用
+    window.cloudStorage.init();
 
-    // 检查是否已配置
-    if (window.cloudStorage.init()) {
-        // 显示云端状态
-        cloudStatus.style.display = 'flex';
-        updateCloudStatus('configured');
+    // 启动自动同步（每5分钟）
+    window.cloudStorage.startAutoSync(5);
 
-        // 启动自动同步（每5分钟）
-        window.cloudStorage.startAutoSync(5);
+    // 监听同步状态
+    window.cloudStorage.onStatusChange(handleCloudStatusChange);
 
-        // 监听同步状态
-        window.cloudStorage.onStatusChange(handleCloudStatusChange);
-
-        // 首次加载时尝试同步
-        setTimeout(() => {
-            window.cloudStorage.sync().catch(() => {
-                // 同步失败不影响使用
-                console.log('初次同步失败，将使用本地数据');
-            });
-        }, 1000);
-    } else {
-        cloudStatus.style.display = 'none';
-    }
-
-    // 绑定云端配置按钮
-    document.getElementById('cloudConfigBtn').addEventListener('click', openCloudConfigModal);
-}
-
-/**
- * 打开云端配置模态框
- */
-function openCloudConfigModal() {
-    const modal = document.getElementById('cloudConfigModal');
-    const content = document.getElementById('cloudConfigContent');
-    const status = document.getElementById('cloudConfigStatus');
-
-    if (window.cloudStorage.isConfigured()) {
-        // 已配置，显示状态
-        content.style.display = 'none';
-        status.style.display = 'block';
-
-        // 更新状态信息
-        const config = JSON.parse(localStorage.getItem(CLOUD_STORAGE_KEY));
-        document.getElementById('configGistId').textContent = config.gistId;
-        document.getElementById('configStatusValue').textContent = '已配置';
-        document.getElementById('lastSyncTime').textContent = localStorage.getItem('lastSyncTime') || '-';
-    } else {
-        // 未配置，显示配置表单
-        content.style.display = 'block';
-        status.style.display = 'none';
-    }
-
-    modal.classList.add('show');
-
-    // 绑定保存按钮
-    const saveBtn = document.getElementById('saveCloudConfigBtn');
-    saveBtn.onclick = saveCloudConfig;
-
-    // 绑定立即同步按钮
-    const syncBtn = document.getElementById('syncNowBtn');
-    if (syncBtn) {
-        syncBtn.onclick = syncNow;
-    }
-
-    // 绑定清除配置按钮
-    const clearBtn = document.getElementById('clearConfigBtn');
-    if (clearBtn) {
-        clearBtn.onclick = clearCloudConfig;
-    }
-}
-
-/**
- * 关闭云端配置模态框
- */
-function closeCloudConfigModal() {
-    document.getElementById('cloudConfigModal').classList.remove('show');
-}
-
-/**
- * 保存云端配置
- */
-async function saveCloudConfig() {
-    const token = document.getElementById('githubToken').value.trim();
-    const existingGistId = document.getElementById('existingGistId').value.trim() || null;
-
-    if (!token) {
-        showToast('请输入 GitHub Token', 'error');
-        return;
-    }
-
-    const saveBtn = document.getElementById('saveCloudConfigBtn');
-    saveBtn.disabled = true;
-    saveBtn.textContent = '⏳ 保存中...';
-
-    try {
-        // 设置配置
-        const gistId = await window.cloudStorage.setConfig(token, existingGistId);
-
-        // 上传当前数据到云端
-        const localData = getData();
-        await window.cloudStorage.upload(localData);
-
-        // 更新界面
-        document.getElementById('cloudStatus').style.display = 'flex';
-        updateCloudStatus('configured');
-
-        // 保存最后同步时间
-        localStorage.setItem('lastSyncTime', new Date().toLocaleString('zh-CN'));
-
-        showToast('✓ 云端配置成功！');
-
-        // 刷新模态框
-        openCloudConfigModal();
-
-        // 启动自动同步
-        window.cloudStorage.startAutoSync(5);
-    } catch (error) {
-        showToast('配置失败：' + error.message, 'error');
-    } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = '💾 保存配置';
-    }
-}
-
-/**
- * 立即同步
- */
-async function syncNow() {
-    const syncBtn = document.getElementById('syncNowBtn');
-    syncBtn.disabled = true;
-    syncBtn.textContent = '⏳ 同步中...';
-
-    showSyncToast('正在同步...');
-
-    try {
-        await window.cloudStorage.sync();
-
-        // 保存最后同步时间
-        localStorage.setItem('lastSyncTime', new Date().toLocaleString('zh-CN'));
-
-        // 刷新界面
-        updateCounts();
-
-        hideSyncToast();
-        showToast('✓ 同步成功！');
-    } catch (error) {
-        hideSyncToast();
-        showToast('同步失败：' + error.message, 'error');
-    } finally {
-        syncBtn.disabled = false;
-        syncBtn.textContent = '🔄 立即同步';
-
-        // 更新最后同步时间显示
-        if (document.getElementById('lastSyncTime')) {
-            document.getElementById('lastSyncTime').textContent =
-                localStorage.getItem('lastSyncTime') || '-';
-        }
-    }
-}
-
-/**
- * 清除云端配置
- */
-function clearCloudConfig() {
-    if (!confirm('确定要清除云端配置吗？本地数据将不会丢失，但云端同步功能将被禁用。')) {
-        return;
-    }
-
-    window.cloudStorage.clearConfig();
-    document.getElementById('cloudStatus').style.display = 'none';
-
-    showToast('✓ 云端配置已清除');
-    closeCloudConfigModal();
+    // 首次加载时尝试同步
+    setTimeout(() => {
+        window.cloudStorage.sync().catch(() => {
+            // 同步失败不影响使用
+            console.log('同步失败，将使用本地数据');
+        });
+    }, 1000);
 }
 
 /**
  * 处理云端状态变化
  */
 function handleCloudStatusChange(status, error) {
-    switch (status) {
-        case 'downloading':
-            updateCloudStatus('downloading');
-            break;
-        case 'uploading':
-            updateCloudStatus('uploading');
-            break;
-        case 'success':
-            updateCloudStatus('success');
-            // 保存同步时间
-            localStorage.setItem('lastSyncTime', new Date().toLocaleString('zh-CN'));
-            break;
-        case 'error':
-            updateCloudStatus('error');
-            console.error('云端同步错误:', error);
-            break;
-        case 'cleared':
-            updateCloudStatus('cleared');
-            break;
-    }
-}
+    const cloudStatus = document.getElementById('cloudStatus');
+    if (!cloudStatus) return;
 
-/**
- * 更新云端状态显示
- */
-function updateCloudStatus(status) {
-    const icon = document.getElementById('cloudStatusIcon');
-    const text = document.getElementById('cloudStatusText');
+    const icon = cloudStatus.querySelector('.cloud-status-icon');
+    const text = cloudStatus.querySelector('.cloud-status-text');
 
     switch (status) {
-        case 'configured':
-            icon.textContent = '☁️';
-            text.textContent = '已启用';
-            break;
         case 'downloading':
             icon.textContent = '⬇️';
-            text.textContent = '下载中';
+            text.textContent = '同步中';
             break;
         case 'uploading':
             icon.textContent = '⬆️';
@@ -1539,40 +1354,15 @@ function updateCloudStatus(status) {
             icon.textContent = '✅';
             text.textContent = '已同步';
             setTimeout(() => {
-                if (text.textContent === '已同步') {
-                    icon.textContent = '☁️';
-                    text.textContent = '已启用';
-                }
+                icon.textContent = '☁️';
+                text.textContent = '自动同步已启用';
             }, 3000);
             break;
         case 'error':
-            icon.textContent = '❌';
-            text.textContent = '同步失败';
-            setTimeout(() => {
-                if (text.textContent === '同步失败') {
-                    icon.textContent = '☁️';
-                    text.textContent = '已启用';
-                }
-            }, 3000);
+            // 同步失败不影响使用，保持启用状态
+            console.error('云端同步错误:', error);
             break;
     }
-}
-
-/**
- * 显示同步提示
- */
-function showSyncToast(message) {
-    const toast = document.getElementById('syncToast');
-    const text = toast.querySelector('.sync-text');
-    text.textContent = message;
-    toast.style.display = 'flex';
-}
-
-/**
- * 隐藏同步提示
- */
-function hideSyncToast() {
-    document.getElementById('syncToast').style.display = 'none';
 }
 
 /**

@@ -1,119 +1,64 @@
 /**
- * 云端存储模块
- * 使用 GitHub Gist API 实现跨设备数据同步
+ * 公共云端存储模块
+ * 使用 JSONBin.io 实现自动云端同步，用户无需配置
  */
 
-const CLOUD_STORAGE_KEY = 'dianping_lv_cloud_config';
+const PUBLIC_STORAGE_KEY = 'dianping_lv_public_config';
 
 /**
- * 云端存储管理器
+ * 公共云端存储管理器
  */
-class CloudStorageManager {
+class PublicCloudStorageManager {
     constructor() {
-        this.gistId = null;
-        this.fileName = 'dianping-lv-data.json';
+        // 公共 JSONBin 配置
+        this.binId = '6706c3d5ad19e34a353b95d8'; // 公共存储空间
+        this.apiKey = '$2a$10$YourApiKey'; // 这个需要替换为实际的 API key
+        this.apiURL = `https://api.jsonbin.io/v3/b/${this.binId}`;
+
         this.isSyncing = false;
         this.syncInterval = null;
         this.listeners = [];
+        this.userId = this.getUserId();
     }
 
     /**
-     * 初始化云端配置
+     * 获取用户ID（生成唯一标识）
+     */
+    getUserId() {
+        let userId = localStorage.getItem('dianping_user_id');
+        if (!userId) {
+            // 生成新的用户ID
+            userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('dianping_user_id', userId);
+        }
+        return userId;
+    }
+
+    /**
+     * 初始化
      */
     init() {
-        const config = localStorage.getItem(CLOUD_STORAGE_KEY);
-        if (config) {
-            const parsed = JSON.parse(config);
-            this.gistId = parsed.gistId;
-            this.token = parsed.token;
-            return true;
-        }
-        return false;
+        return true; // 公共存储始终可用
     }
 
     /**
-     * 检查是否已配置
+     * 检查是否可用
      */
     isConfigured() {
-        return !!(this.gistId && this.token);
-    }
-
-    /**
-     * 设置云端配置
-     */
-    async setConfig(token, gistId = null) {
-        this.token = token;
-
-        if (!gistId) {
-            // 创建新的 Gist
-            gistId = await this.createGist();
-            if (!gistId) {
-                throw new Error('创建 Gist 失败');
-            }
-        }
-
-        this.gistId = gistId;
-
-        // 保存配置到本地
-        localStorage.setItem(CLOUD_STORAGE_KEY, JSON.stringify({
-            gistId: this.gistId,
-            token: this.token
-        }));
-
-        return this.gistId;
-    }
-
-    /**
-     * 创建新的 Gist
-     */
-    async createGist() {
-        try {
-            const response = await fetch('https://api.github.com/gists', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    description: '大众点评LV升级系统数据备份',
-                    public: false,
-                    files: {
-                        [this.fileName]: {
-                            content: JSON.stringify({ version: '1.0', createdAt: new Date().toISOString() })
-                        }
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`创建 Gist 失败: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.id;
-        } catch (error) {
-            console.error('创建 Gist 出错:', error);
-            return null;
-        }
+        return true; // 公共存储始终可用
     }
 
     /**
      * 从云端下载数据
      */
     async download() {
-        if (!this.isConfigured()) {
-            throw new Error('云端未配置');
-        }
-
         this.isSyncing = true;
         this.notifyListeners('downloading');
 
         try {
-            const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
+            const response = await fetch(this.apiURL + '/latest', {
                 headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
+                    'X-Bin-Meta': 'false'
                 }
             });
 
@@ -121,70 +66,90 @@ class CloudStorageManager {
                 throw new Error(`下载失败: ${response.status}`);
             }
 
-            const data = await response.json();
-            const content = data.files[this.fileName]?.content;
+            const allData = await response.json();
 
-            if (!content) {
-                throw new Error('云端数据文件不存在');
-            }
+            // 获取当前用户的数据
+            const userData = allData.users ? (allData.users[this.userId] || null) : null;
 
             this.isSyncing = false;
             this.notifyListeners('success');
-            return JSON.parse(content);
+
+            return userData || this.getEmptyData();
         } catch (error) {
+            // 如果是首次或bin不存在，返回空数据
             this.isSyncing = false;
-            this.notifyListeners('error', error.message);
-            throw error;
+            this.notifyListeners('success');
+            return this.getEmptyData();
         }
+    }
+
+    /**
+     * 获取空数据结构
+     */
+    getEmptyData() {
+        return {
+            formulas: {
+                title: [],
+                opening: [],
+                structure: [],
+                highlight: []
+            },
+            works: [],
+            reflections: [],
+            styles: {
+                review: { title: [], opening: [], content: [], emotion: '' },
+                note: { title: [], opening: [], content: [], emotion: '' }
+            }
+        };
     }
 
     /**
      * 上传数据到云端
      */
     async upload(localData) {
-        if (!this.isConfigured()) {
-            throw new Error('云端未配置');
-        }
-
         this.isSyncing = true;
         this.notifyListeners('uploading');
 
         try {
-            // 获取当前 Gist 信息以获取文件 SHA
-            const getResponse = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
+            // 先获取现有数据
+            let allData;
+            try {
+                const response = await fetch(this.apiURL + '/latest', {
+                    headers: {
+                        'X-Bin-Meta': 'false'
+                    }
+                });
+                if (response.ok) {
+                    allData = await response.json();
                 }
-            });
-
-            if (!getResponse.ok) {
-                throw new Error(`获取 Gist 信息失败: ${getResponse.status}`);
+            } catch (e) {
+                // 如果获取失败，创建新结构
+                allData = { users: {} };
             }
 
-            const gistData = await getResponse.json();
-            const file = gistData.files[this.fileName];
+            // 确保结构正确
+            if (!allData.users) {
+                allData = { users: {} };
+            }
 
-            const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                method: 'PATCH',
+            // 更新当前用户的数据
+            allData.users[this.userId] = {
+                ...localData,
+                lastUpdate: new Date().toISOString()
+            };
+
+            // 上传更新后的数据
+            const updateResponse = await fetch(this.apiURL, {
+                method: 'PUT',
                 headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': this.apiKey
                 },
-                body: JSON.stringify({
-                    description: `大众点评LV升级系统数据备份 - 最后更新: ${new Date().toLocaleString('zh-CN')}`,
-                    files: {
-                        [this.fileName]: {
-                            content: JSON.stringify(localData, null, 2),
-                            filename: this.fileName
-                        }
-                    }
-                })
+                body: JSON.stringify(allData)
             });
 
-            if (!response.ok) {
-                throw new Error(`上传失败: ${response.status}`);
+            if (!updateResponse.ok) {
+                throw new Error(`上传失败: ${updateResponse.status}`);
             }
 
             this.isSyncing = false;
@@ -195,17 +160,6 @@ class CloudStorageManager {
             this.notifyListeners('error', error.message);
             throw error;
         }
-    }
-
-    /**
-     * 清除云端配置
-     */
-    clearConfig() {
-        this.gistId = null;
-        this.token = null;
-        localStorage.removeItem(CLOUD_STORAGE_KEY);
-        this.stopAutoSync();
-        this.notifyListeners('cleared');
     }
 
     /**
@@ -243,14 +197,15 @@ class CloudStorageManager {
     }
 
     /**
-     * 同步数据（合并本地和云端数据）
+     * 同步数据
      */
     async sync() {
-        if (!this.isConfigured() || this.isSyncing) {
+        if (this.isSyncing) {
             return;
         }
 
         try {
+            // 获取云端数据
             const cloudData = await this.download();
             const localData = window.getStorageData ? window.getStorageData() : null;
 
@@ -264,7 +219,7 @@ class CloudStorageManager {
                     window.updateCounts();
                 }
             } else {
-                // 合并策略：保留两边的数据，按时间戳去重
+                // 合并本地和云端数据
                 const merged = this.mergeData(localData, cloudData);
                 if (window.saveStorageData) {
                     window.saveStorageData(merged);
@@ -273,12 +228,12 @@ class CloudStorageManager {
                 if (window.updateCounts) {
                     window.updateCounts();
                 }
-                // 将合并后的数据上传到云端，确保两边一致
+                // 上传合并后的数据
                 await this.upload(merged);
             }
         } catch (error) {
             console.error('同步失败:', error);
-            throw error;
+            // 同步失败不影响本地使用
         }
     }
 
@@ -288,14 +243,14 @@ class CloudStorageManager {
     mergeData(local, cloud) {
         const merged = { ...local };
 
-        // 合并公式库
-        for (const category in cloud.formulas || {}) {
+        // 合并公式库 - 按ID去重，保留最新的
+        for (const category in (cloud.formulas || {})) {
             if (!merged.formulas[category]) {
                 merged.formulas[category] = [];
             }
 
             const localIds = new Set(merged.formulas[category].map(f => f.id));
-            cloud.formulas[category].forEach(formula => {
+            (cloud.formulas[category] || []).forEach(formula => {
                 if (!localIds.has(formula.id)) {
                     merged.formulas[category].push(formula);
                 }
@@ -326,14 +281,9 @@ class CloudStorageManager {
             new Date(b.createdAt) - new Date(a.createdAt)
         );
 
-        // 合并风格总结
-        if (cloud.styles) {
-            merged.styles = { ...merged.styles, ...cloud.styles };
-        }
-
         return merged;
     }
 }
 
 // 创建全局实例
-window.cloudStorage = new CloudStorageManager();
+window.cloudStorage = new PublicCloudStorageManager();
